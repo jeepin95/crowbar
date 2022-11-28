@@ -155,8 +155,8 @@ class Main:
         parser.add_argument('-D', '--debug', dest='debug', action='store_true', help='Enable debug mode', default=False)
         parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='Only display successful logins',
                             default=False)
-        parser.add_argument('-L', '--line', dest='start_line', action='store')
-        parser.add_argument('-P', '--pass', dest='start_password', action='store')
+        parser.add_argument('-L', '--line', dest='start_line', action='store', help='Line number to start on from password file, useful for resuming a long list.')
+        parser.add_argument('-P', '--pass', dest='start_password', action='store', help='Password from file to start from, useful for resuming a long list.')
 
         parser.add_argument('options', nargs='*', action=AddressAction)
 
