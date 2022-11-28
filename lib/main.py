@@ -504,7 +504,7 @@ class Main:
                     if start_password is not None:
                         start_processing = False
                         for password in passwdfile:
-                            if start_processing = True:
+                            if start_processing == True:
                                 pool.add_task(self.rdplogin, ip, self.args.username, password, port)
                             elif password == start_password:
                                 start_processing = True
