@@ -155,6 +155,8 @@ class Main:
         parser.add_argument('-D', '--debug', dest='debug', action='store_true', help='Enable debug mode', default=False)
         parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='Only display successful logins',
                             default=False)
+        parser.add_argument('-L', '--line', dest='start_line', action='store')
+
         parser.add_argument('options', nargs='*', action=AddressAction)
 
         try:
@@ -428,6 +430,10 @@ class Main:
 
     def rdp(self):
         port = 3389
+        start_line = 0
+        if self.args.start_line is not None:
+            self.logger.output_file(f'Start Line: {self.args.start_line}')
+            start_line = self.args.start_line
 
         if not os.path.exists(self.xfreerdp_path):
             mess = "xfreerdp: %s path doesn't exists on the system" % os.path.abspath(self.xfreerdp_path)
@@ -489,9 +495,11 @@ class Main:
                     except Exception as err:
                         mess = "Error: %s" % err
                         raise CrowbarExceptions(mess)
-
+                    current_line = 0
                     for password in passwdfile:
-                        pool.add_task(self.rdplogin, ip, self.args.username, password, port)
+                        if current_line >= start_line:
+                            pool.add_task(self.rdplogin, ip, self.args.username, password, port)
+                        current_line += 1
                 else:
                     pool.add_task(self.rdplogin, ip, self.args.username, self.args.passwd, port)
         pool.wait_completion()
