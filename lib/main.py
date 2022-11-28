@@ -156,6 +156,7 @@ class Main:
         parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='Only display successful logins',
                             default=False)
         parser.add_argument('-L', '--line', dest='start_line', action='store')
+        parser.add_argument('-P', '--pass', dest='start_password', action='store')
 
         parser.add_argument('options', nargs='*', action=AddressAction)
 
@@ -431,9 +432,13 @@ class Main:
     def rdp(self):
         port = 3389
         start_line = 0
+        start_password = None
         if self.args.start_line is not None:
             self.logger.output_file(f'Start Line: {self.args.start_line}')
             start_line = self.args.start_line
+        if self.args.start_password is not None:
+            self.logger.output_file(f'Starting From: {self.args.start_password}')
+            start_password = self.args.start_password
 
         if not os.path.exists(self.xfreerdp_path):
             mess = "xfreerdp: %s path doesn't exists on the system" % os.path.abspath(self.xfreerdp_path)
@@ -496,10 +501,20 @@ class Main:
                         mess = "Error: %s" % err
                         raise CrowbarExceptions(mess)
                     current_line = 0
-                    for password in passwdfile:
-                        if current_line >= start_line:
-                            pool.add_task(self.rdplogin, ip, self.args.username, password, port)
-                        current_line += 1
+                    if start_password is not None:
+                        start_processing = False
+                        for password in passwdfile:
+                            if start_processing = True:
+                                pool.add_task(self.rdplogin, ip, self.args.username, password, port)
+                            elif password == start_password:
+                                start_processing = True
+                                self.logger.output_file(f'Starting at line: {current_line}')
+                            current_line += 1
+                    else:
+                        for password in passwdfile:
+                            if current_line >= start_line:
+                                pool.add_task(self.rdplogin, ip, self.args.username, password, port)
+                            current_line += 1
                 else:
                     pool.add_task(self.rdplogin, ip, self.args.username, self.args.passwd, port)
         pool.wait_completion()
